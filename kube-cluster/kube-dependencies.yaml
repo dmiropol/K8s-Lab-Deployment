@@ -1,0 +1,95 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install Docker
+    apt:
+      name: docker.io
+      state: present
+      update_cache: true
+
+  - name: Creating a docker daemon file 
+    copy:
+      dest: /etc/docker/daemin.json
+      content: |
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"],
+          "log-driver": "json-file",
+          "log-opts": {
+          "max-size": "100m"
+          },
+          "storage-driver": "overlay2"
+        }
+
+  - name: Starting Docker
+    service:
+      name: docker
+      state: started
+        
+  - name: install APT Transport HTTPS
+    apt:
+      name: apt-transport-https
+      state: present
+ 
+  - name: add Kubernetes apt-key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+ 
+  - name: add Kubernetes APT repository
+    apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: 'kubernetes'
+  
+  - name: install kubelet
+    apt:
+      name: kubelet=1.21.9-00
+      state: present
+      update_cache: true
+      allow_downgrade: true
+
+  - name: start kubelet
+    service:
+      name: kubelet
+      enabled: yes
+      state: started
+ 
+  - name: install kubeadm
+    apt:
+      name: kubeadm=1.21.9-00
+      state: present
+      allow_downgrade: true
+ 
+- hosts: master
+  become: yes
+  tasks:
+
+  - name: install pip dependencies
+    apt:
+      name: pip
+      state: present
+
+  - name: install kubernetes ansible dependencies 
+    pip:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - PyYAML 
+      - kubernetes
+
+  - name: install helm 
+    shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    
+  - name: update alias configuration block in bash_profile
+    copy:
+      dest: /home/ubuntu/.bash_profile
+      content: |
+        alias k='kubectl'
+        alias kg='kubectl get'
+        alias ka='kubectl apply'
+        alias kd='kubectl delete'
+        alias kdes='kubectl describe'
+        alias klog='kubectl logs'
+        alias wak='watch kubectl get'
+        

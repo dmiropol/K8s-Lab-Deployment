@@ -1,0 +1,40 @@
+---
+- hosts: master
+  tasks:
+
+  - name: patch ConfigMap to delete ako created objects from Avi controller 
+    kubernetes.core.k8s:
+      definition:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: avi-k8s-config
+          namespace: avi-system
+        data:
+          deleteConfig: "true"
+      continue_on_error: true
+
+  - name: get helm ako name
+    shell: helm list -n avi-system -q
+    register: ako_name
+  
+  - name: Remove ako release 
+    kubernetes.core.helm:
+      name: "{{ ako_name.stdout_lines[0] }}"
+      release_state: absent
+      release_namespace: avi-system
+  
+  - name: Waiting for ako pod to be deleted  ...
+    shell: kubectl get pod -n avi-system 
+    register: ako_pod
+    until: '"No resources found " in ako_pod.stderr'
+    retries: 10
+    delay: 5
+
+  - name: delete ako namespace
+    kubernetes.core.k8s:
+      name: ako
+      api_version: v1
+      kind: Namespace
+      state: absent
+

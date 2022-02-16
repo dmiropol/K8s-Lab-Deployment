@@ -1,0 +1,23 @@
+---
+- hosts: master
+  become: yes
+  tasks:
+  - name: initialize the cluster
+    shell: kubeadm init --pod-network-cidr="{{ vars.pod_network_cidr }}"
+ 
+  - name: create directories
+    become: yes
+    become_user: ubuntu
+    file:
+      path: /home/ubuntu/.kube
+      state: directory
+      mode: 0755
+  
+  - name: copy kube config file
+    copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+        mode: 0400
+          

@@ -1,0 +1,39 @@
+---
+- hosts: master
+  tasks:
+
+  - name: delete Antrea interworking
+    kubernetes.core.k8s:
+      state: absent
+      src: "{{ vars.base_path }}/{{ vars.antrea_interworking_yaml }}"
+      continue_on_error: true
+    when: vars.cni_kind == "antrea"
+
+  - name: delete NCP CNI
+    kubernetes.core.k8s:
+      state: absent
+      src: "{{ vars.base_path }}/{{ vars.cni_yaml }}"
+      continue_on_error: true
+    when: vars.cni_kind == "ncp"
+
+  - name: Waiting for CNI pods to be deleted ...
+    shell: kubectl get pods -n kube-system | grep antrea
+    register: get_pods
+    until: '"No resources found " in get_pods.stderr'
+    retries: 10
+    delay: 10
+    when: vars.cni_kind == "antrea"
+
+  - name: Waiting for CNI pods to be deleted ...
+    shell: kubectl get pods -n nsx-system 
+    register: get_pods
+    until: '"No resources found " in get_pods.stderr'
+    retries: 10
+    delay: 10
+    when: vars.cni_kind == "ncp"
+
+  - name: Running NSX policy cleanup script...
+    command: 'python3 {{ vars.base_path }}/ncp/nsx_policy_cleanup.py --mgr-ip="{{ vars.nsx_mgr_ip }}" -u "{{ vars.nsx_username }}" -p "{{ vars.nsx_password }}" -c "{{ vars.nsx_cluster }}" --top-tier-router-id="{{ vars.nsx_top_tier_router_id }}" --no-warning -r'
+    when: vars.cni_kind == "ncp"
+    
+

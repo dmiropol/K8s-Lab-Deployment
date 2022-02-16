@@ -1,0 +1,39 @@
+---
+- hosts: master
+  tasks:
+  
+  - name: Create avi-system namespace for ako
+    kubernetes.core.k8s:
+      name: avi-system
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Add AKO Helm charts repo
+    kubernetes.core.helm_repository:
+      name: ako
+      repo_url: https://projects.registry.vmware.com/chartrepo/ako
+
+  - name: install AKO
+    kubernetes.core.helm:
+      release_name: ako
+      chart_ref: ako/ako
+      release_state: present
+      release_namespace: avi-system
+      values_files: "{{ vars.base_path }}/{{ vars.ako_yaml }}"
+      chart_version: 1.5.2
+      release_values:
+        generate-name: true
+        set:
+          ControllerSettings:
+            controllerIP: "{{ avi_controller }}" 
+          avicredentials:
+            username: "{{ avi_user }}"
+            password: "{{ avi_password }}"
+
+  - name: Waiting for ako pod to come up...
+    shell: kubectl get pods -n avi-system 
+    register: get_pods
+    until: ' "Running" in get_pods.stdout'
+    retries: 10
+    delay: 10

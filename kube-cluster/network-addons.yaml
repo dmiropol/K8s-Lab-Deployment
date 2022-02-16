@@ -1,0 +1,20 @@
+---
+- hosts: master
+  tasks:
+
+  - name: install Antrea NSX interworking
+    kubernetes.core.k8s:
+      state: present
+      src: "{{ item }}"
+    with_items:
+      - "{{ vars.base_path }}/{{ antrea_interworking_bootstrap_yaml }}"
+      - "{{ vars.base_path }}/{{ antrea_interworking_yaml }}"
+    when: vars.cni_kind == "antrea"
+    
+  - name: Waiting for pods to come up...
+    shell: kubectl get pods -n vmware-system-antrea | grep interworking 
+    register: get_pods
+    until: ' "Running" in get_pods.stdout'
+    retries: 10 
+    delay: 5
+    when: vars.cni_kind == "antrea"

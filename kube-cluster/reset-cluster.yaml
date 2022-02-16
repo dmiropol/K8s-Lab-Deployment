@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: reset kubeadm
+    shell: kubeadm reset -f
+
+  - name: delete .kube directory
+    become: yes
+    become_user: ubuntu
+    file:
+      path: $HOME/.kube
+      state: absent
+
+  - name: delete CNI directory
+    become: yes
+    file: 
+      state: absent
+      path: "{{ item }}"
+    with_items: 
+      - /etc/cni/net.d/
+      - /etc/kubernetes/
+    

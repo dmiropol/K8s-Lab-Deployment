@@ -1,0 +1,26 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: allow 'ubuntu' to have passwordless sudo
+    lineinfile:
+      dest: /etc/sudoers
+      line: 'ubuntu ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
+  - name: Disabling Swap on all nodes
+    shell: swapoff -a
+    
+  - name: Commenting Swap entries in /etc/fstab
+    replace:
+     path: /etc/fstab
+     regexp: '(.*swap*)'
+     replace: '#\1'
+
+- hosts: master
+  become: yes
+  tasks:
+  - name: install nfs client
+    apt:
+      name: nfs-common
+      state: present

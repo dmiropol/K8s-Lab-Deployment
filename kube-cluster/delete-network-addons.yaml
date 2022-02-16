@@ -1,0 +1,18 @@
+---
+- hosts: master
+  tasks:
+
+  - name: deregister Antrea interworking
+    kubernetes.core.k8s:
+      state: present
+      src: "{{ vars.base_path }}/{{ vars.antrea_deregister_job_yaml }}"
+    when: vars.cni_kind == "antrea"
+
+  - name: Waiting for deregister pod to complete  ...
+    shell: kubectl get pods -n vmware-system-antrea | grep deregister
+    register: get_pods
+    until: ' "Completed" in get_pods.stdout'
+    retries: 10
+    delay: 10
+    when: vars.cni_kind == "antrea"
+
