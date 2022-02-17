@@ -21,7 +21,7 @@
     register: get_pods
     until: '"No resources found " in get_pods.stderr'
     retries: 10
-    delay: 10
+    delay: 5
     when: vars.cni_kind == "antrea"
 
   - name: Waiting for CNI pods to be deleted ...
@@ -29,11 +29,6 @@
     register: get_pods
     until: '"No resources found " in get_pods.stderr'
     retries: 10
-    delay: 10
+    delay: 5
     when: vars.cni_kind == "ncp"
-
-  - name: Running NSX policy cleanup script...
-    command: 'python3 {{ vars.base_path }}/ncp/nsx_policy_cleanup.py --mgr-ip="{{ vars.nsx_mgr_ip }}" -u "{{ vars.nsx_username }}" -p "{{ vars.nsx_password }}" -c "{{ vars.nsx_cluster }}" --top-tier-router-id="{{ vars.nsx_top_tier_router_id }}" --no-warning -r'
-    when: vars.cni_kind == "ncp"
-    
 

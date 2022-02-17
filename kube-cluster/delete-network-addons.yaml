@@ -16,3 +16,10 @@
     delay: 10
     when: vars.cni_kind == "antrea"
 
+  - name: Running NSX policy cleanup script...
+    command: 'python3 {{ vars.base_path }}/ncp/nsx_policy_cleanup.py --mgr-ip="{{ vars.nsx_mgr_ip }}" -u "{{ vars.nsx_username }}" -p "{{ vars.nsx_password }}" -c "{{ vars.nsx_cluster }}" --top-tier-router-id="{{ vars.nsx_top_tier_router_id }}" --no-warning -r'
+    register: cleanup_output
+    until: '"No top tier-1 router to be deleted" in cleanup_output.stdout'
+    retries: 1
+    delay: 5
+    when: vars.cni_kind == "ncp"

@@ -21,7 +21,7 @@
       release_state: present
       release_namespace: avi-system
       values_files: "{{ vars.base_path }}/{{ vars.ako_yaml }}"
-      chart_version: 1.5.2
+      #chart_version: 1.5.2 
       release_values:
         generate-name: true
         set:
@@ -36,4 +36,4 @@
     register: get_pods
     until: ' "Running" in get_pods.stdout'
     retries: 10
-    delay: 10
+    delay: 5
