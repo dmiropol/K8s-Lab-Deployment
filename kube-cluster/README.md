@@ -39,7 +39,7 @@ Destroy playbook performs the following tasks:
 - Avi 21.1.3 configured with NSXT cloud
 - ncp, antrea and ako yaml files pre-configured and accessible from jumphost
 - `hosts_ncp.ini` or `hosts_antrea.ini` files configured to match your environment
-- `nsx_policy_cleanup.py` file required for destroying clsuter with ncp. If script errors out, you may need to re-run it manually. Alternatively, create shell script `cleanup-ncp.sh` and let the `destroy-cluster.sh` script to run it after kubernetes cluster has been completely destroyed.
+- `nsx_policy_cleanup.py` file required for destroying cluster with ncp. If script errors out, you may need to re-run it manually. Alternatively, create shell script `cleanup-ncp.sh` and let the `destroy-cluster.sh` script to run it after kubernetes cluster has been completely destroyed.
 
 ## Initial installation
 
