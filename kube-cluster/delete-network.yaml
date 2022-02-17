@@ -1,30 +1,22 @@
 ---
 - hosts: master
   tasks:
-
-  - name: delete Antrea interworking
-    kubernetes.core.k8s:
-      state: absent
-      src: "{{ vars.base_path }}/{{ vars.antrea_interworking_yaml }}"
-      continue_on_error: true
-    when: vars.cni_kind == "antrea"
-
-  - name: delete NCP CNI
+  
+  - name: delete {{ vars.cni_kind }} CNI
     kubernetes.core.k8s:
       state: absent
       src: "{{ vars.base_path }}/{{ vars.cni_yaml }}"
       continue_on_error: true
-    when: vars.cni_kind == "ncp"
 
-  - name: Waiting for CNI pods to be deleted ...
+  - name: Waiting for {{ vars.cni_kind }} CNI pods to be deleted ...
     shell: kubectl get pods -n kube-system | grep antrea
     register: get_pods
-    until: '"No resources found " in get_pods.stderr'
+    changed_when: get_pods.stdout == ""
     retries: 10
     delay: 5
     when: vars.cni_kind == "antrea"
 
-  - name: Waiting for CNI pods to be deleted ...
+  - name: Waiting for {{ vars.cni_kind }} CNI pods to be deleted ...
     shell: kubectl get pods -n nsx-system 
     register: get_pods
     until: '"No resources found " in get_pods.stderr'
