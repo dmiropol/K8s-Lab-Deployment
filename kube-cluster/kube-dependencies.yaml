@@ -44,7 +44,14 @@
   
   - name: install kubelet
     apt:
-      name: kubelet=1.21.9-00
+      name: kubelet=1.26.6-00
+      state: present
+      update_cache: true
+      allow_downgrade: true
+
+  - name: install kubectl
+    apt:
+      name: kubectl=1.26.6-00
       state: present
       update_cache: true
       allow_downgrade: true
@@ -57,7 +64,7 @@
  
   - name: install kubeadm
     apt:
-      name: kubeadm=1.21.9-00
+      name: kubeadm=1.26.6-00
       state: present
       allow_downgrade: true
  

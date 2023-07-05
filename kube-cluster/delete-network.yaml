@@ -1,26 +1,21 @@
 ---
 - hosts: master
+  gather_facts: no
   tasks:
-  
   - name: delete {{ vars.cni_kind }} CNI
     kubernetes.core.k8s:
       state: absent
       src: "{{ vars.base_path }}/{{ vars.cni_yaml }}"
       continue_on_error: true
 
+  - name: waiting 5 sec...
+    wait_for:
+      timeout: 5
+      
   - name: Waiting for {{ vars.cni_kind }} CNI pods to be deleted ...
-    shell: kubectl get pods -n kube-system | grep antrea
-    register: get_pods
-    changed_when: get_pods.stdout == ""
-    retries: 10
-    delay: 5
-    when: vars.cni_kind == "antrea"
-
-  - name: Waiting for {{ vars.cni_kind }} CNI pods to be deleted ...
-    shell: kubectl get pods -n nsx-system 
+    shell: kubectl get pods -n kube-system -l component=antrea-agent
     register: get_pods
     until: '"No resources found " in get_pods.stderr'
     retries: 10
     delay: 5
-    when: vars.cni_kind == "ncp"
 

@@ -3,7 +3,7 @@
   become: yes
   tasks:
   - name: initialize the cluster
-    shell: kubeadm init --pod-network-cidr="{{ vars.pod_network_cidr }}"
+    shell: kubeadm init --pod-network-cidr="{{ vars.pod_network_cidr }}" --apiserver-advertise-address="{{ vars.api_server }}"
  
   - name: create directories
     become: yes
@@ -20,4 +20,3 @@
         remote_src: yes
         owner: ubuntu
         mode: 0400
-          

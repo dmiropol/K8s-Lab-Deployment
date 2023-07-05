@@ -21,7 +21,7 @@
       release_state: present
       release_namespace: avi-system
       values_files: "{{ vars.base_path }}/{{ vars.ako_yaml }}"
-      #chart_version: 1.5.2 
+      chart_version: "{{ vars.ako_version }}" 
       release_values:
         generate-name: true
         set:

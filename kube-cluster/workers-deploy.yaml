@@ -13,11 +13,13 @@
 
 - hosts: workers
   become: yes
+  gather_facts: false
   tasks:
   - name: join cluster
     shell: "{{ hostvars['master'].join_command }} --ignore-preflight-errors all"
 
 - hosts: master
+  gather_facts: false
   tasks:
   - name: waiting for workers to join the cluster
     shell: kubectl get nodes 

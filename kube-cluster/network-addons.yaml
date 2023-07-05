@@ -11,6 +11,7 @@
       - "{{ vars.base_path }}/{{ antrea_interworking_yaml }}"
     when: vars.cni_kind == "antrea"
     
+
   - name: Waiting for pods to come up...
     shell: kubectl get pods -n vmware-system-antrea | grep interworking 
     register: get_pods
@@ -18,3 +19,4 @@
     retries: 10 
     delay: 5
     when: vars.cni_kind == "antrea"
+

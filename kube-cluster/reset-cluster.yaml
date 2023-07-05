@@ -1,9 +1,18 @@
 ---
 - hosts: all
+  gather_facts: false
   become: yes
   tasks:
   - name: reset kubeadm
     shell: kubeadm reset -f
+
+  - name: delete CNI directory
+    file: 
+      state: absent
+      path: "{{ item }}"
+    with_items: 
+      - /etc/cni/net.d/
+      - /etc/kubernetes/
 
   - name: delete .kube directory
     become: yes
@@ -11,13 +20,3 @@
     file:
       path: $HOME/.kube
       state: absent
-
-  - name: delete CNI directory
-    become: yes
-    file: 
-      state: absent
-      path: "{{ item }}"
-    with_items: 
-      - /etc/cni/net.d/
-      - /etc/kubernetes/
-    
