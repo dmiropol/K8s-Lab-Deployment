@@ -1,0 +1,66 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: inventorycleanup
+  labels:
+    app: antrea-interworking
+    component: cleanup
+  namespace: vmware-system-antrea
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+        - name: inventorycleanup
+          args:
+            - --bootstrap-config
+            - /etc/antrea/bootstrap.conf
+            - --config
+            - /etc/antrea/mp-adapter.conf
+          command:
+            - antrea-inventory-cleanup
+          image: public.ecr.aws/w6j6h8a9/antrea-interworking-debian:0.11.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/antrea
+              name: projected-configs
+              readOnly: true
+      restartPolicy: OnFailure
+      serviceAccountName: interworking
+      hostNetwork: true
+      volumes:
+        - name: projected-configs
+          projected:
+            sources:
+              - configMap:
+                  name: antrea-interworking-config
+                  items:
+                    - key: mp-adapter.conf
+                      path: mp-adapter.conf
+              - configMap:
+                  name: bootstrap-config
+                  items:
+                    - key: bootstrap.conf
+                      path: bootstrap.conf
+              - configMap:
+                  name: cluster-id
+                  items:
+                    - key: cluster-id.conf
+                      path: cluster-id.conf
+                  optional: true
+              - secret:
+                  name: nsx-cert
+                  items:
+                    - key: tls.crt
+                      path: nsx-cert/tls.crt
+                    - key: tls.key
+                      path: nsx-cert/tls.key
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+  backoffLimit: 3

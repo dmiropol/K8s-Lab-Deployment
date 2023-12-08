@@ -1,0 +1,24 @@
+# this manifest is from
+# https://github.com/antrea-io/antrea/blob/main/docs/antrea-network-policy.md#select-namespace-by-name
+# this requires to restart antrea-controller
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  # Do not edit this name.
+  name: "labelsmutator.antrea.io"
+webhooks:
+  - name: "namelabelmutator.antrea.io"
+    clientConfig:
+      service:
+        name: "antrea"
+        namespace: "kube-system"
+        path: "/mutate/namespace"
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["namespaces"]
+        scope: "Cluster"
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    timeoutSeconds: 5

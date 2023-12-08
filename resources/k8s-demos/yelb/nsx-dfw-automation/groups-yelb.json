@@ -1,0 +1,93 @@
+{
+  "groups": [
+    {
+      "expression": [
+        {
+          "member_type": "Namespace",
+          "key": "Name",
+          "operator": "EQUALS",
+          "value": "yelb",
+          "resource_type": "Condition"
+        }
+      ],
+      "group_type": [
+        "ANTREA"
+      ],
+      "resource_type": "Group",
+      "id": "yelb-ns",
+      "display_name": "yelb-ns"
+    },
+    {
+      "expression": [
+        {
+          "member_type": "Pod",
+          "key": "Tag",
+          "operator": "EQUALS",
+          "scope_operator": "EQUALS",
+          "value": "dis:k8s:tier|frontend",
+          "resource_type": "Condition"
+        }
+      ],
+      "group_type": [
+        "ANTREA"
+      ],
+      "resource_type": "Group",
+      "id": "yelb_frontend",
+      "display_name": "yelb_frontend"
+    },
+    {
+      "expression": [
+        {
+          "member_type": "Pod",
+          "key": "Tag",
+          "operator": "EQUALS",
+          "scope_operator": "EQUALS",
+          "value": "dis:k8s:tier|middletier",
+          "resource_type": "Condition"
+        }
+      ],
+      "group_type": [
+        "ANTREA"
+      ],
+      "resource_type": "Group",
+      "id": "yelb_middletier",
+      "display_name": "yelb_middletier"
+    },
+    {
+      "expression": [
+        {
+          "member_type": "Pod",
+          "key": "Tag",
+          "operator": "EQUALS",
+          "scope_operator": "EQUALS",
+          "value": "dis:k8s:tier|backenddb",
+          "resource_type": "Condition"
+        }
+      ],
+      "group_type": [
+        "ANTREA"
+      ],
+      "resource_type": "Group",
+      "id": "yelb_backend",
+      "display_name": "yelb_backend-db"
+    },
+    {
+      "expression": [
+        {
+          "member_type": "Pod",
+          "key": "Tag",
+          "operator": "EQUALS",
+          "scope_operator": "EQUALS",
+          "value": "dis:k8s:app|redis-server",
+          "resource_type": "Condition"
+        }
+      ],
+      "group_type": [
+        "ANTREA"
+      ],
+      "resource_type": "Group",
+      "id": "yelb-cache",
+      "display_name": "yelb-cache"
+    }
+  ]
+}

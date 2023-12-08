@@ -1,0 +1,61 @@
+{
+  "services": [
+    {
+      "is_default": false,
+      "service_entries": [
+        {
+          "l4_protocol": "TCP",
+          "source_ports": [],
+          "destination_ports": [
+            "4567"
+          ],
+          "resource_type": "L4PortSetServiceEntry",
+          "id": "yelb-rubi-4567",
+          "display_name": "yelb-rubi-4567"
+        }
+      ],
+      "service_type": "NON_ETHER",
+      "resource_type": "Service",
+      "id": "yelb-rubi-appserver",
+      "display_name": "yelb-rubi-appserver"
+    },
+    {
+      "is_default": false,
+      "service_entries": [
+        {
+          "l4_protocol": "TCP",
+          "source_ports": [],
+          "destination_ports": [
+            "5432"
+          ],
+          "resource_type": "L4PortSetServiceEntry",
+          "id": "yelb-postgres-5432",
+          "display_name": "yelb-postgres-5432"
+        }
+      ],
+      "service_type": "NON_ETHER",
+      "resource_type": "Service",
+      "id": "yelb-postgres-db",
+      "display_name": "yelb-postgres-db"
+    },
+    {
+      "is_default": false,
+      "service_entries": [
+        {
+          "l4_protocol": "TCP",
+          "source_ports": [],
+          "destination_ports": [
+            "6379"
+          ],
+          "resource_type": "L4PortSetServiceEntry",
+          "id": "yelb-redis-6379",
+          "display_name": "yelb-redis-6379"
+        }
+      ],
+      "service_type": "NON_ETHER",
+      "resource_type": "Service",
+      "id": "yelb-redis-cache",
+      "display_name": "yelb-redis-cache"
+    }
+  ]
+}

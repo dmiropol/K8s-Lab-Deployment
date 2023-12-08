@@ -1,0 +1,7 @@
+{
+  "env": {
+    "nsxmgr": "https://nsxapp-01b.corp.local",
+    "nsx_user": "admin",
+    "nsx_password": "VMware1!VMware1!"
+  }
+}

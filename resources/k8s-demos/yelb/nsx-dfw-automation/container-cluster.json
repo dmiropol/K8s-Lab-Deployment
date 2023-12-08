@@ -1,0 +1,11 @@
+{
+  "security-policy-container-cluster": [
+    {
+      "container_cluster_type": "ANTREA",
+      "container_cluster_path": "/infra/sites/default/enforcement-points/default/cluster-control-planes/k8s-cluster2",
+      "resource_type": "SecurityPolicyContainerCluster",
+      "id": "Yelb_App",
+      "display_name": "k8s-cluster2"
+    }
+  ]
+}

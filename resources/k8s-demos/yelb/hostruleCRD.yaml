@@ -1,0 +1,22 @@
+apiVersion: ako.vmware.com/v1alpha1
+kind: HostRule
+metadata:
+  name: yelb-host-rule
+spec:
+  virtualhost:
+    fqdn: yelb-ui.yelb.ako.corp.local # mandatory
+    enableVirtualHost: true
+    #aliases:
+    #- vip2.avi.com
+    wafPolicy: System-WAF-Policy
+    #tls:
+    #  sslKeyCertificate:
+    #    name: System-Default-Cert
+    #    type: ref
+    #  sslProfile: System-Standard
+    #  termination: edge
+    analyticsPolicy: # optional
+      fullClientLogs:
+        enabled: true
+        throttle: HIGH
+      logAllHeaders: true

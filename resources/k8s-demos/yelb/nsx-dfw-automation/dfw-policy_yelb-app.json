@@ -1,0 +1,130 @@
+{
+  "security-policies": [
+    {
+      "resource_type": "SecurityPolicy",
+      "target_type": "ANTREA",
+      "id": "Yelb_App",
+      "display_name": "Yelb_App",
+      "scope": [
+        "ANY"
+      ],
+      "rules": [
+        {
+          "action": "ALLOW",
+          "resource_type": "Rule",
+          "id": "access_to_frontend",
+          "display_name": "access to frontend",
+          "sequence_number": 10,
+          "source_groups": [
+            "ANY"
+          ],
+          "destination_groups": [
+            "ANY"
+          ],
+          "services": [
+            "/infra/services/HTTP"
+          ],
+          "profiles": [
+            "ANY"
+          ],
+          "logged": false,
+          "scope": [
+            "/infra/domains/default/groups/yelb_frontend"
+          ]
+        },
+        {
+          "action": "ALLOW",
+          "resource_type": "Rule",
+          "id": "frontend_to_app",
+          "display_name": "frontend to app",
+          "sequence_number": 20,
+          "source_groups": [
+            "ANY"
+          ],
+          "destination_groups": [
+            "/infra/domains/default/groups/yelb_middletier"
+          ],
+          "services": [
+            "/infra/services/yelb-rubi-appserver"
+          ],
+          "profiles": [
+            "ANY"
+          ],
+          "logged": false,
+          "scope": [
+            "/infra/domains/default/groups/yelb_frontend"
+          ]
+        },
+        {
+          "action": "ALLOW",
+          "resource_type": "Rule",
+          "id": "app_to_db",
+          "display_name": "app to backend db",
+          "sequence_number": 30,
+          "source_groups": [
+            "ANY"
+          ],
+          "destination_groups": [
+            "/infra/domains/default/groups/yelb_backend"
+          ],
+          "services": [
+            "/infra/services/yelb-postgres-db"
+          ],
+          "profiles": [
+            "ANY"
+          ],
+          "logged": false,
+          "scope": [
+            "/infra/domains/default/groups/yelb_middletier"
+          ]
+        },
+        {
+          "action": "ALLOW",
+          "resource_type": "Rule",
+          "id": "app_to_cache",
+          "display_name": "app to cache",
+          "sequence_number": 40,
+          "source_groups": [
+            "ANY"
+          ],
+          "destination_groups": [
+            "/infra/domains/default/groups/yelb-cache"
+          ],
+          "services": [
+            "/infra/services/yelb-redis-cache"
+          ],
+          "profiles": [
+            "ANY"
+          ],
+          "logged": false,
+          "scope": [
+            "/infra/domains/default/groups/yelb_middletier"
+          ]
+        },
+        {
+          "action": "DROP",
+          "resource_type": "Rule",
+          "id": "deny_others",
+          "display_name": "deny others",
+          "sequence_number": 50,
+          "source_groups": [
+            "ANY"
+          ],
+          "destination_groups": [
+            "/infra/domains/default/groups/yelb-ns"
+          ],
+          "services": [
+            "ANY"
+          ],
+          "profiles": [
+            "ANY"
+          ],
+          "logged": false,
+          "scope": [
+            "/infra/domains/default/groups/yelb-ns"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+#Edit the configmap used for AKO and set the deleteConfig flag to true if you want to delete the AKO created objects.
+kubectl edit configmap avi-k8s-config -n avi-system 
+ 
+#Delete AKO using the command shown below:
+helm delete $(helm list -n avi-system -q) -n avi-system
+ 
+
+
+#forceful delete ako
+#!/bin/bash
+kd crd aviinfrasettings.ako.vmware.com
+kd crd hostrules.ako.vmware.com
+kd crd httprules.ako.vmware.com
+kd  ServiceAccount "ako-sa"
+kd  Secret "avi-secret"
+kd  ConfigMap "avi-k8s-config"
+kd  ClusterRole "ako-cr"
+kd  ClusterRoleBinding "ako-crb"
+kd  StatefulSet "ako"
+kd  IngressClass "avi-lb"
+kd ns avi-system

@@ -1,0 +1,135 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: antrea-interworking
+  name: antrea-interworking-deregister
+rules:
+  - apiGroups:
+      - clusterinformation.antrea-interworking.tanzu.vmware.com
+    resources:
+      - antreaccpadapterinfos
+      - antreampadapterinfos
+    verbs:
+      - get
+      - delete
+      - deletecollection
+  - apiGroups:
+      - crd.antrea.io
+    resources:
+      - traceflows
+    verbs:
+      - get
+      - delete
+      - deletecollection
+  - apiGroups:
+      - crd.antrea.io
+    resources:
+      - clusternetworkpolicies
+      - networkpolicies
+      - tiers
+      - clustergroups
+    verbs:
+      - get
+      - delete
+      - deletecollection
+  - apiGroups:
+      - crd.antrea.tanzu.vmware.com
+    resources:
+      - tierentitlementbindings
+      - tierentitlements
+    verbs:
+      - get
+      - delete
+      - deletecollection
+  - apiGroups:
+      - policy
+    resourceNames:
+      - vmware-system-privileged
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: antrea-interworking
+  name: antrea-interworking-deregister
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: antrea-interworking-deregister
+subjects:
+  - kind: ServiceAccount
+    name: register
+    namespace: vmware-system-antrea
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deregister
+  labels:
+    app: antrea-interworking
+    component: register
+  namespace: vmware-system-antrea
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+        - name: deregister
+          image: public.ecr.aws/w6j6h8a9/antrea-interworking-debian:0.11.0
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/local/bin/cluster-registry"]
+          args:
+            - deregister
+            - --logtostderr=false
+            - --log_dir=/var/log/interworking
+            - --alsologtostderr
+            - --log_file_max_size=5
+            - --log_file_max_num=4
+          volumeMounts:
+            - mountPath: /etc/antrea
+              name: projected-configs
+              readOnly: true
+            - mountPath: /var/log/interworking
+              name: host-var-log-interworking
+      restartPolicy: OnFailure
+      serviceAccountName: register
+      hostNetwork: true
+      volumes:
+        - name: host-var-log-interworking
+          hostPath:
+            path: /var/log/interworking
+            type: DirectoryOrCreate
+        - name: projected-configs
+          projected:
+            sources:
+              - configMap:
+                  name: bootstrap-config
+                  items:
+                    - key: bootstrap.conf
+                      path: bootstrap.conf
+              - configMap:
+                  name: cluster-id
+                  items:
+                    - key: cluster-id.conf
+                      path: cluster-id.conf
+              - secret:
+                  name: nsx-cert
+                  items:
+                    - key: tls.crt
+                      path: nsx-cert/tls.crt
+                    - key: tls.key
+                      path: nsx-cert/tls.key
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+  backoffLimit: 3
