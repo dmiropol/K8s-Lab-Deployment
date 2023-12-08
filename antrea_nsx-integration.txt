@@ -1,0 +1,32 @@
+reference: 
+https://www.vrealize.it/2021/12/20/antrea-to-nsx-t-integration/
+
+# install k8s with antrea cni /Automation/K8s-Lab-Deployment/
+
+# generate ssl key and cert on k8s-master
+export cluster_name=k8s-cluster1
+openssl genrsa -out $cluster_name-private.key 2048
+openssl req -new -key $cluster_name-private.key -out $cluster_name.csr -subj "/C=US/ST=CA/L=Palo Alto/O=VMware/OU=Antrea Cluster/CN=$cluster_name"
+openssl x509 -req -days 3650 -in $cluster_name.csr -signkey $cluster_name-private.key -out $cluster_name.crt
+
+# create NSX Principal Identity with k8s-cluster1.crt 
+# apply changes to  antrea-interworking-0.11.0/bootstrap-config.yaml using cert and key, clusterName and NSXManagers using base64
+
+cat ~/k8s-cluster1.crt | base64 -w 0
+cat ~/k8s-cluster1-private.key | base64 -w 0
+
+# Open interworking.yaml and deregisterjob.jaml and set image url to "public.ecr.aws/w6j6h8a9/antrea-interworking-debian:0.11.0"
+# vmware harbor hosted image gives  503 gateway error and container crash loop backoff
+
+# apply in exactly this order
+kubectl apply -f bootstrap-config.yaml -f interworking.yaml
+
+kubectl get pods -n vmware-system-antrea
+
+
+# delete/deregister
+
+kubectl apply -f deregisterjob.yaml
+kubectl get job -o wide deregister -n vmware-system-antrea
+
+kubectl delete -f interworking.yaml --ignore-not-found
